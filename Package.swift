@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.6
 
 //  twitter-text
 //
@@ -18,7 +18,13 @@ let package = Package(
     ],
 
     targets: [
-        .target(name: "TwitterText", dependencies: ["UnicodeURL"]),
+        .target(
+            name: "TwitterText",
+            dependencies: ["UnicodeURL"],
+            resources: [
+                .process("Config/"),
+            ]
+        ),
         .testTarget(name: "TwitterTextTests", dependencies: ["TwitterText"])
     ]
 )

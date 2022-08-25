@@ -8,6 +8,8 @@
 import Foundation
 
 enum ConfigurationType {
+    static var folderPath = "Config/"
+    
     static let classic = "v1"
     static let v2 = "v2"
     static let v3 = "v3"
