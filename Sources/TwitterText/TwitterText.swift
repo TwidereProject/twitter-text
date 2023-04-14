@@ -122,7 +122,7 @@ public class TwitterText {
 
             let tcoResult: NSTextCheckingResult?
             if let url = url {
-                tcoResult = self.validTCOURLRegexp.firstMatch(in: url, options: [], range: NSMakeRange(0, url.utf16.count))
+                tcoResult = self.validTCOURLRegexp.firstMatch(in: url, options: [], range: NSRange(url.startIndex..., in: url))
             } else {
                 tcoResult = nil
             }
@@ -135,11 +135,7 @@ public class TwitterText {
                     continue
                 }
 
-                guard let tcoUrlSlugRange = Range(nsTcoUrlSlugRange, in: text) else {
-                    continue
-                }
-
-                let tcoUrlSlug = String(text[tcoUrlSlugRange])
+                let tcoUrlSlug = (url as? NSString)?.substring(with: nsTcoUrlSlugRange) ?? ""
 
                 if tcoUrlSlug.utf16.count > TwitterText.maxTCOSlugLength {
                     continue

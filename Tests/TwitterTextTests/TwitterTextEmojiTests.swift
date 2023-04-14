@@ -65,3 +65,11 @@ final class TwitterTextEmojiTests: XCTestCase {
         XCTAssertFalse("Á".isEmoji)
     }
 }
+
+extension TwitterTextEmojiTests {
+    func testEmojiFollowedByURL() {
+        let text = "测试文字测试文字🧵\nhttps://t.co/ABCabcAb7C"
+        let entities = TwitterText.entities(in: text)
+        XCTAssertEqual(entities.count, 1)
+    }
+}
