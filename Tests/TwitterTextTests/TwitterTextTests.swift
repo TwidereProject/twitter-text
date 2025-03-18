@@ -81,6 +81,21 @@ final class TwitterTextTests: XCTestCase {
         XCTAssertEqual(entities.count, 0)
     }
 
+    func testURLWithZeroWidthJoinerFailsParsingButDoesntCrash() {
+        // The "2" character in the URL has a zero-width-joiner which causes parsing to fail, but the library shouldn't crash
+        let text = "Heroes 🚀 https://t.co/11111112‍"
+        let entities = TwitterText.entities(in: text)
+
+        XCTAssertEqual(entities.count, 0)
+    }
+
+    func testURLWithoutZeroWidthJoinerParsesOneEntity() {
+        let text = "Heroes 🚀 https://t.co/11111112"
+        let entities = TwitterText.entities(in: text)
+
+        XCTAssertEqual(entities.count, 1)
+    }
+
     func testExtract() {
         let filename = conformanceRootDirectory.appendingPathComponent("extract.json")
         guard let jsonData = try? String(contentsOf: filename, encoding: .utf8).data(using: .utf8),
@@ -596,7 +611,7 @@ final class TwitterTextTests: XCTestCase {
             return
         }
 
-        Parser.setDefaultParser(with: Configuration.configuration(fromJSONResource: ConfigurationType.classic)!)
+        Parser.setDefaultParser(with: Configuration.configuration(fromType: ConfigurationType.classic)!)
 
         guard let tests = validation["tests"] as? [String: Any] else {
             XCTFail()
@@ -679,17 +694,17 @@ final class TwitterTextTests: XCTestCase {
     }
 
     func testUnicodePointTweetLengthCounting() {
-        Parser.setDefaultParser(with: Configuration.configuration(fromJSONResource: ConfigurationType.v2)!)
+        Parser.setDefaultParser(with: Configuration.configuration(fromType: ConfigurationType.v2)!)
         self._testWeightedTweetsCountingWithTestSuite(testSuite: "WeightedTweetsCounterTest")
     }
 
     func testEmojiWeightedTweetLengthCounting() {
-        Parser.setDefaultParser(with: Configuration.configuration(fromJSONResource: ConfigurationType.v3)!)
+        Parser.setDefaultParser(with: Configuration.configuration(fromType: ConfigurationType.v3)!)
         self._testWeightedTweetsCountingWithTestSuite(testSuite: "WeightedTweetsWithDiscountedEmojiCounterTest")
     }
 
     func testEmojiWeightedTweetLengthCountingWithDiscountedUnicode9Emoji() {
-        Parser.setDefaultParser(with: Configuration.configuration(fromJSONResource: ConfigurationType.v3)!)
+        Parser.setDefaultParser(with: Configuration.configuration(fromType: ConfigurationType.v3)!)
         self._testWeightedTweetsCountingWithTestSuite(testSuite: "WeightedTweetsWithDiscountedUnicode9EmojiCounterTest")
     }
 
@@ -703,7 +718,7 @@ final class TwitterTextTests: XCTestCase {
             return
         }
 
-        Parser.setDefaultParser(with: Configuration.configuration(fromJSONResource: ConfigurationType.v3)!)
+        Parser.setDefaultParser(with: Configuration.configuration(fromType: ConfigurationType.v3)!)
         self._testWeightedTweetsCountingWithTestSuite(testSuite: "WeightedTweetsWithDiscountedUnicode10EmojiCounterTest")
     }
 
@@ -713,7 +728,7 @@ final class TwitterTextTests: XCTestCase {
         var text = "ZWJ: क्ष -> क्\u{200D}ष; ZWNJ: क्ष -> क्\u{200C}ष"
         text = self.stringByParsingUnicodeEscapes(string: text)
 
-        Parser.setDefaultParser(with: Configuration.configuration(fromJSONResource: ConfigurationType.v3)!)
+        Parser.setDefaultParser(with: Configuration.configuration(fromType: ConfigurationType.v3)!)
         let results = Parser.defaultParser.parseTweet(text: text)
 
         XCTAssertEqual(results.weightedLength, 35)
@@ -888,9 +903,9 @@ final class TwitterTextTests: XCTestCase {
 
     func testTwitterTextParserConfigurationV2ToV3Transition() {
         guard let configurationV2 = Configuration
-                .configuration(fromJSONResource: ConfigurationType.v2),
+                .configuration(fromType: ConfigurationType.v2),
               let configurationV3 = Configuration
-                .configuration(fromJSONResource: ConfigurationType.v3) else {
+                .configuration(fromType: ConfigurationType.v3) else {
             XCTFail()
             return
         }
