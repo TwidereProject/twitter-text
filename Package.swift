@@ -1,4 +1,4 @@
-// swift-tools-version:5.6
+// swift-tools-version:5.7
 
 //  twitter-text
 //
@@ -20,7 +20,9 @@ let package = Package(
     targets: [
         .target(
             name: "TwitterText",
-            dependencies: ["UnicodeURL"],
+            dependencies: [
+                .product(name: "UnicodeURL", package: "UnicodeURL"),
+            ],
             path: "Sources/TwitterText",
             resources: [
                 .copy("Templates/v1.json"),
